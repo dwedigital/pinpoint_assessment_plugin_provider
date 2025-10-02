@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Header, Request
-from helpers import svg_file_to_base64, png_to_base64
+from helpers import svg_file_to_base64, png_to_base64, get_field_value
 from typing import Annotated
 import requests as apiRequests
 
@@ -89,12 +89,18 @@ async def export(request: Request):
             "submitEndpoint": "/create_assessment",
         }
     
-    packages = apiRequests.get("http://localhost:8001/packages")
-    packages = packages.json()
-    
+    try:
+        packages = apiRequests.get("http://localhost:8001/packages", headers={"X_EXAMPLE_ASSESSMENTS_KEY": api_key})
+        if packages.status_code != 200:
+            raise Exception(f"Failed to fetch packages: {packages.status_code} {packages.text}")
+        else:
+            packages = packages.json()
+            packages =  [{"label": package["name"], "value": str(package["id"])} for package in packages]
+    except Exception as e:
+        print(f"Error fetching packages: {str(e)}")
 
-    packages =  [{"label": package["name"], "value": str(package["id"])} for package in packages]
-    print(packages)
+
+
 
 
     # Extract candidate information
@@ -147,11 +153,46 @@ async def export(request: Request):
 
 @app.post("/create_assessment")
 async def create_assessment(request):
-    print(await request.json())
+    
+    form_data = await request.json()
+    print("Form Data Received: ", form_data)
+
+    assessment_payload = {
+        "firstName": form_data.get("firstName"),
+        "lastName": form_data.get("lastName"),
+        "email": form_data.get("email"),
+        "packageId": form_data.get("selectedTest"),
+    }
+
+    try:
+        response = apiRequests.post(
+            "http://localhost:8001/assessments/",
+            json=assessment_payload,
+            headers={"X_EXAMPLE_ASSESSMENTS_KEY": API_KEY},
+        )
+        if response.status_code != 200:
+            raise Exception(f"Failed to create assessment: {response.status_code} {response.text}")
+        else:
+            assessment = response.json()
+            print("Assessment created successfully:", assessment)
+            return {
+                "status": "success",
+                "message": "Assessment created successfully",
+                "assessmentId": assessment.get("id"),
+                "assessmentLink": f"http://localhost:8001/assessments/{assessment.get('id')}",
+            }
+    except Exception as e:
+        print(f"Error creating assessment: {str(e)}")
+        return {
+            "status": "error",
+            "message": f"Error creating assessment: {str(e)}",
+        }
 
     return
 
 
 if __name__ == "__main__":
     import uvicorn
+
+    # if you want hotreload, use the command line: uvicorn provider:app --host 0.0.0.0 --port 8000 --reload
     uvicorn.run(app, host="0.0.0.0", port=8000)

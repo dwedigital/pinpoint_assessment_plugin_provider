@@ -1,9 +1,22 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException, Security
 from fastapi.responses import HTMLResponse
 from helpers import get_assessment_database, write_assessments_database
+from fastapi.security import APIKeyHeader
 
 
-app = FastAPI()
+api_key_header = APIKeyHeader(name="X_EXAMPLE_ASSESSMENTS_KEY")
+
+async def get_api_key(api_key: str = Security(api_key_header)):
+    # Replace with your actual API key validation logic
+    VALID_API_KEY = "ABCDEFG123456789" 
+    if api_key != VALID_API_KEY:
+        raise HTTPException(
+            status_code=401, detail="Invalid API Key"
+        )
+    return api_key
+
+
+app = FastAPI(dependencies=[Depends(get_api_key)])
 
 assessments = get_assessment_database()
 
@@ -38,10 +51,7 @@ async def read_assessment(id: str):
 
 @app.post("/assessments/")
 async def submit_assessment(assessment_details: dict):
-    assessment = {
-        "id": "1",
-        "status": "submitted"
-    }
+    
 
     assessments.append(assessment)
     write_assessments_database(assessments)
@@ -51,5 +61,5 @@ async def submit_assessment(assessment_details: dict):
 
 if __name__ == "__main__":
     import uvicorn
-
+    # if you want hotreload, use the command line: uvicorn provider:app --host 0.0.0.0 --port 8001 --reload
     uvicorn.run(app, host="0.0.0.0", port=8001)
