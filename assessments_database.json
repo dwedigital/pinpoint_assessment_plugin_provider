@@ -1,0 +1,14 @@
+[
+  {
+    "id": "1",
+    "name": "Example Edwards",
+    "email": "dave@dwedigital.com",
+    "cv": "",
+    "status": "pending",
+    "description": "Psychological Malleability Test",
+    "webhook_url": "https://app.localtest.me:3001/integration_plugins/webhooks/events/8eb3d290-a39e-4f23-8836-0be1f325d59f?uuid=c2db3246-fac3-4e77-852a-d1f13a369849",
+    "platform_url": "https://app.localtest.me:3001/integration_plugins/candidate_assessments/redirect/c2db3246-fac3-4e77-852a-d1f13a369849",
+    "created_at": "2025-09-30 16:58:23 +0100",
+    "updated_at": "2025-09-30 16:58:23 +0100"
+  }
+]

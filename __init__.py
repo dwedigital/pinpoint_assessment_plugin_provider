@@ -1,1 +1,0 @@
-from helpers import svg_to_base64, svg_file_to_base64, png_to_base64

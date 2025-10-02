@@ -107,3 +107,29 @@ def get_field_value(data, field_key):
         if field["key"] == field_key:
             return field["value"]
     return None
+
+
+def get_assessment_database():
+    import json
+
+    try:
+        with open("assessments_database.json", "r") as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return []
+    except json.JSONDecodeError:
+        return []
+    except Exception as e:
+        print(f"Error reading assessments database: {str(e)}")
+        return []
+    
+def write_assessments_database(assessments):
+    import json
+
+    try:
+        with open("assessments_database.json", "w") as file:
+            json.dump(assessments, file, indent=4)
+            return True
+    except Exception as e:
+        print(f"Error writing assessments database: {str(e)}")
+        return False

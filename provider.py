@@ -1,13 +1,16 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Header, Request
 from helpers import svg_file_to_base64, png_to_base64
+from typing import Annotated
+import requests as apiRequests
+
 app = FastAPI()
 
 API_KEY = "ABCDEFG123456789"
 
+
 @app.get("/hello")
 async def index():
     return {"Message": "Hello, World!"}
-
 
 
 @app.post("/")
@@ -37,7 +40,7 @@ async def config():
             }
         ],
         "webhookProcessEndpoint": "/webhook",
-        "webhookAuthenticationHeader": 'X-Verify',
+        "webhookAuthenticationHeader": "X-Verify",
         "configurationFormFields": [
             {
                 "key": "apiKey",
@@ -47,28 +50,52 @@ async def config():
                 "sensitive": True,
                 "useAsHttpHeader": "X_EXAMPLE_ASSESSMENTS_KEY",
             },
-                        {
+            {
                 "key": "apiBaseURL",
                 "label": "Base URL",
-                "description":'Your Base URL for ExampleAssessments. Use `http://localhost:8000` if running local FastAPI server.',
-                "placeholder":'http://localhost:8000',
+                "description": "Your Base URL for ExampleAssessments. Use `http://localhost:8000` if running local FastAPI server.",
+                "placeholder": "http://localhost:8000",
                 "required": True,
                 "type": "string",
                 "useAsHttpHeader": "X_EXAMPLE_BASE_URL",
             },
         ],
     }
-    
-@app.post("/export")
-async def export(assessmentData: dict):
-    print ("Received assessment data:", assessmentData)
-    # Extract configuration values
-    config = assessmentData.get("configuration", {})
-    api_key = config.get("apiKey")
-    base_url = config.get("apiBaseURL")
 
-    # if api_key != API_KEY:
-    #     return {"status": "error", "message": "Invalid API Key"}
+
+@app.post("/export")
+async def export(request: Request):
+    headers = dict(request.headers)
+    api_key = headers.get("x_example_assessments_key")
+    print(headers)
+    print("API Key: ", headers.get("x_example_assessments_key"))
+    # Extract configuration values
+
+    if api_key != API_KEY or not api_key:
+        return {
+            "actionVersion": "1.0.0",
+            "key": "createAssessment",
+            "label": "Send to ExampleAssessments",
+            "description": "Sends a candidate to the internal ExampleAssessments system",
+            "formFields": [
+                {
+                    "key": "apiKeyCallout",
+                    "label": "No API Key",
+                    "type": "callout",
+                    "intent": "danger",
+                    "description": "No valid API Key provided in configuration. Please update the configuration with a valid API Key.",
+                }
+            ],
+            "submitEndpoint": "/create_assessment",
+        }
+    
+    packages = apiRequests.get("http://localhost:8001/packages")
+    packages = packages.json()
+    
+
+    packages =  [{"label": package["name"], "value": str(package["id"])} for package in packages]
+    print(packages)
+
 
     # Extract candidate information
     # candidate_info = assessmentData.get("candidate", {})
@@ -89,11 +116,7 @@ async def export(assessmentData: dict):
                 "type": "string",
                 "required": True,
                 "value": "",
-                "singleSelectOptions": [
-                    {"label": "Python Developer", "value": "python_dev"},
-                    {"label": "JavaScript Developer", "value": "js_dev"},
-                    {"label": "Data Scientist", "value": "data_sci"},
-                    ],
+                "singleSelectOptions": packages,
             },
             {
                 "key": "firstName",
@@ -117,27 +140,17 @@ async def export(assessmentData: dict):
                 "required": True,
                 "readonly": False,
             },
-            {
-                "key": "cvDocument",
-                "label": "CV",
-                "type": "file",
-                "required": False,
-                "readonly": False,
-            },
         ],
         "submitEndpoint": "/create_assessment",
     }
 
+
 @app.post("/create_assessment")
-async def create_assessment(assessmentDetails: dict):
-    print("Creating assessment with details:", assessmentDetails)
-    # Here you would normally process the assessment creation
-    # For this example, we'll just return a success message
-    return {
-        "status": "success",
-        "message": "Assessment created successfully",
-        "assessmentId": "12345"
-    }
+async def create_assessment(request):
+    print(await request.json())
+
+    return
+
 
 if __name__ == "__main__":
     import uvicorn
