@@ -21,16 +21,16 @@ app = FastAPI(dependencies=[Depends(get_api_key)])
 assessments = get_assessment_database()
 
 PACKAGES = [
-{"id":1, "name":"Python Basics"},
-{"id":2, "name":"Advanced Python"},
-{"id":3, "name":"Data Science with Python"},
-{"id":4, "name":"Web Development with Django"},
-{"id":5, "name":"Machine Learning Fundamentals"},
-{"id":6, "name":"Deep Learning with TensorFlow"},
-{"id":7, "name":"Natural Language Processing"},
-{"id":8, "name":"Python for Data Analysis"},
-{"id":9, "name":"Flask Web Applications"},
-{"id":10, "name":"Python Scripting and Automation"},
+{"id":1, "name":"Hello World: The Journey Begins"},
+{"id":2, "name":"99 Problems But a Syntax Ain't One"},
+{"id":3, "name":"Pandas: Not Just Cute Bears"},
+{"id":4, "name":"Django Unchained (From PHP)"},
+{"id":5, "name":"Teaching Machines to Learn (Instead of Interns)"},
+{"id":6, "name":"Deep Learning: It's Not You, It's Gradients"},
+{"id":7, "name":"Teaching Computers to Read Between the Lines"},
+{"id":8, "name":"DataFrames and Chill"},
+{"id":9, "name":"Flask: Because Django Is Too Mainstream"},
+{"id":10, "name":"Automating Yourself Out of Boring Tasks"},
 ]
 
 @app.get("/hello")
