@@ -1,9 +1,13 @@
-from fastapi import FastAPI, Depends, HTTPException, Security
+from fastapi import FastAPI, HTTPException, Security, APIRouter, Request
 from fastapi.responses import HTMLResponse
 from helpers import get_assessment_database, write_assessments_database
 from fastapi.security import APIKeyHeader
 from datetime import datetime
 import uuid
+from fastapi.templating import Jinja2Templates
+import requests
+
+templates = Jinja2Templates(directory="templates")
 
 
 api_key_header = APIKeyHeader(name="X_EXAMPLE_ASSESSMENTS_KEY")
@@ -17,7 +21,13 @@ async def get_api_key(api_key: str = Security(api_key_header)):
     return api_key
 
 
-app = FastAPI(dependencies=[Depends(get_api_key)])
+app = FastAPI()
+
+protected_router = APIRouter(
+    prefix="/api",
+    dependencies=[Security(get_api_key)]
+)
+
 
 assessments = get_assessment_database()
 
@@ -40,12 +50,12 @@ async def read_root():
     return HTMLResponse(content="<h1>Hello, World!</h1>", status_code=200)
 
 
-@app.get("/packages")
+@protected_router.get("/packages")
 async def read_assessments_list():
     return PACKAGES
 
 
-@app.get("/assessments/{id}")
+@protected_router.get("/assessments/{id}")
 async def read_assessment(id: str):
     for assessment in assessments:
         if assessment["id"] == id:
@@ -58,7 +68,7 @@ async def read_assessment(id: str):
     )
 
 
-@app.post("/assessments/")
+@protected_router.post("/assessments/")
 async def submit_assessment(assessment_details: dict):
 
     id = uuid.uuid4()
@@ -81,6 +91,58 @@ async def submit_assessment(assessment_details: dict):
     assessments.append(assessment)
     write_assessments_database(assessments)
     return assessment
+
+@app.get("/assessments/{id}")
+async def read_assessment(id: str):
+    for assessment in assessments:
+        if assessment["id"] == id:
+            return templates.TemplateResponse("assessment.html", {"request": {}, "assessment_id": id, "status": assessment.get("status")})
+
+    return HTMLResponse(
+        content=f"<h1>Assessment ID: {id} not found</h1>", status_code=404
+
+    )
+
+@app.post("/assessments/{id}/update")
+async def update_assessment(request: Request, id: str):
+    form_data = await request.form()
+    status = form_data.get("status")
+    for assessment in assessments:
+        if assessment["id"] == id:
+            assessment["status"] = status
+            assessment["score"] = form_data.get("score")
+            assessment["updated_at"] = datetime.now().strftime('%Y-%m-%d %H:%M:%S %z').strip()
+            write_assessments_database(assessments)
+
+            payload = {
+                "id": form_data.get("id"),
+                "status": form_data.get("status"),
+                "score": form_data.get("score"),
+                "report_path": f"reports/{assessment['id']}"
+            }
+
+            requests.post(assessment["webhook_url"], json=payload, verify=False)
+            return templates.TemplateResponse("update_assessment.html", {"request": {}, "assessment_id": id, "status": assessment.get("status")})
+    
+    
+    return HTMLResponse(
+        content=f"<h1>Assessment ID: {id} not found</h1>", status_code=404
+    )
+
+@app.get("/assessments/reports/{id}")
+async def read_assessment_report(id: str):
+    for assessment in assessments:
+        if assessment["id"] == id:
+            return templates.TemplateResponse("report.html", {"request": {}, "assessment_id": id, 
+                                                              "status": assessment.get("status"), "score": assessment.get("score"),
+                                                              "candidate_name": assessment.get("name"),
+                                                              "description": assessment.get("description"),
+                                                              "assessment_date": assessment.get("created_at")
+
+                                                              })
+    return HTMLResponse(
+        content=f"<h1>Assessment Report ID: {id} not found</h1>", status_code=404
+    )
 
 
 if __name__ == "__main__":

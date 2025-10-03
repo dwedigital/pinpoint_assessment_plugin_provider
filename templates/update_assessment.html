@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Assessment</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f4f6fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 500px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            padding: 32px 40px;
+        }
+        h1 {
+            font-size: 2rem;
+            color: #2d3a4b;
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #4b5a6a;
+            font-weight: 500;
+        }
+        input[type="number"], select {
+            width: 100%;
+            padding: 8px 10px;
+            margin-bottom: 18px;
+            border: 1px solid #d1d9e6;
+            border-radius: 4px;
+            font-size: 1rem;
+            background: #f8fafc;
+        }
+        button {
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #1e40af;
+        }
+        .status {
+            font-size: 1.1rem;
+            color: #64748b;
+            margin-bottom: 22px;
+        }
+        text{
+            color:#334155;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Update Assessment {{ assessment_id }}</h1>
+        <div class="status">Status: <strong>{{ status }}</strong></div>
+        <form method="post" action="/assessments/{{ assessment_id }}/update">
+            <label for="score">Score (0-100):</label>
+            <input type="number" id="score" name="score" min="0" max="100" required value="{{ current_score }}">
+
+            <label for="status">Status:</label>
+            <select id="status" name="status">
+                <option value="pending" {% if status == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="in_progress" {% if status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                <option value="completed" {% if status == 'completed' %}selected{% endif %}>Completed</option>
+            </select>
+
+            <button type="submit">Update</button>
+        </form>
+    </div>
+</body>
+</html>

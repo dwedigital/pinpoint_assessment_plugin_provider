@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Assessment Report</title>
+    <style>
+        body {
+            background: #f8fafc;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .report-container {
+            background: #fff;
+            max-width: 700px;
+            margin: 40px auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 32px 40px;
+        }
+        h1 {
+            text-align: center;
+            color: #2d3a4b;;
+            font-size: 2.2em;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+        p {
+            font-size: 1.08em;
+            margin: 10px 0;
+            color: #334155;
+        }
+        strong {
+            color: #0f172a;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 28px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 14px 12px;
+            text-align: left;
+        }
+        th {
+            background: #2d3a4b;;
+            color: #fff;
+            font-weight: 500;
+            border: none;
+        }
+        td {
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+            color: #334155;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <h1>Assessment Report</h1>
+        <p><strong>Assessment ID:</strong> {{ assessment_id }}</p>
+        <p><strong>Candidate:</strong> {{ candidate_name }}</p>
+        <p><strong>Date:</strong> {{ assessment_date }}</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Section</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ description }}</td>
+                    <td>{{ score }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

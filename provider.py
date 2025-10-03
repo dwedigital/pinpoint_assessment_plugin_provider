@@ -3,10 +3,12 @@ from helpers import svg_file_to_base64, png_to_base64, get_field_value
 from typing import Annotated
 import requests as apiRequests
 import uuid
+import json
 
 app = FastAPI()
 
 API_KEY = "ABCDEFG123456789"
+ASSESSMENT_REPORT_PATH  = "http://localhost:8001/assessments/"
 
 
 @app.get("/hello")
@@ -102,8 +104,7 @@ async def export(request: Request):
         else:
             packages = packages.json()
             packages = [
-                {"label": name, "value": str(id)}
-                for id, name in packages.items()
+                {"label": name, "value": str(id)} for id, name in packages.items()
             ]
     except Exception as e:
         print(f"Error fetching packages: {str(e)}")
@@ -189,27 +190,28 @@ async def create_assessment(request: Request):
                 "success": False,
                 "toast": {
                     "error": "API Key was blank. Please check the configuration.",
-
                 },
             }
         else:
             assessment = response.json()
             print("Assessment created successfully:", assessment)
             return {
-          'resultVersion': '1.0.0',
-          'key': 'createAssessment',
-          'success': True,
-          'assessmentName': assessment['name'],
-          'message': "\n".join([
-            f"{get_field_value(form_data, 'firstName')} was successfully sent to the example assessment plugin.",
-            f"Last name was {get_field_value(form_data, 'lastName')}.",
-            f"The external ID was {str(assessment['id'])}."
-          ]),
-          'status': assessment['status'],
-          'externalIdentifier': str(assessment['id']),
-          'externalRecordUrl': f"{api_base_url}/api/{assessment['id']}",
-          'externalLinks': [],
-        }
+                "resultVersion": "1.0.0",
+                "key": "createAssessment",
+                "success": True,
+                "assessmentName": assessment["name"],
+                "message": "\n".join(
+                    [
+                        f"{get_field_value(form_data, 'firstName')} was successfully sent to the example assessment plugin.",
+                        f"Last name was {get_field_value(form_data, 'lastName')}.",
+                        f"The external ID was {str(assessment['id'])}.",
+                    ]
+                ),
+                "status": assessment["status"],
+                "externalIdentifier": str(assessment["id"]),
+                "externalRecordUrl": f"{api_base_url}/api/{assessment['id']}",
+                "externalLinks": [],
+            }
     except Exception as e:
         print(f"Error creating assessment: {str(e)}")
         return {
@@ -217,7 +219,34 @@ async def create_assessment(request: Request):
             "message": f"Error creating assessment: {str(e)}",
         }
 
-    return
+
+@app.post("/webhook")
+async def process_webhook(request: Request):
+
+    print("Webhook Process Called")
+    request = await request.json()
+    body = json.loads(request["body"])
+
+    print("Webhook Data Received: ", body)
+
+    # Process the webhook data as needed
+    # For example, you might want to update the assessment status based on the webhook event
+
+    return {
+        "resultVersion": "1.0.0",
+        "success": True,
+        "updateAssessments": [
+            {
+                "externalIdentifier": body.get("id"),
+                "status": body.get("status"),
+                "score": int(body.get("score")),
+                "shouldNotify": True,
+                "externalLinks": [
+                    {"key": "report", "label": "Report", "url": f"{ASSESSMENT_REPORT_PATH}{body.get("report_path")}"}
+                ],
+            }
+        ],
+    }
 
 
 if __name__ == "__main__":
