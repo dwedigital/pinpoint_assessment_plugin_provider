@@ -1,14 +1,91 @@
 [
-  {
-    "id": "1",
-    "name": "Example Edwards",
-    "email": "dave@dwedigital.com",
-    "cv": "",
-    "status": "pending",
-    "description": "Psychological Malleability Test",
-    "webhook_url": "https://app.localtest.me:3001/integration_plugins/webhooks/events/8eb3d290-a39e-4f23-8836-0be1f325d59f?uuid=c2db3246-fac3-4e77-852a-d1f13a369849",
-    "platform_url": "https://app.localtest.me:3001/integration_plugins/candidate_assessments/redirect/c2db3246-fac3-4e77-852a-d1f13a369849",
-    "created_at": "2025-09-30 16:58:23 +0100",
-    "updated_at": "2025-09-30 16:58:23 +0100"
-  }
+    {
+        "id": "1",
+        "name": "Example Edwards",
+        "email": "dave@dwedigital.com",
+        "cv": "",
+        "status": "pending",
+        "description": "Psychological Malleability Test",
+        "webhook_url": "https://app.localtest.me:3001/integration_plugins/webhooks/events/8eb3d290-a39e-4f23-8836-0be1f325d59f?uuid=c2db3246-fac3-4e77-852a-d1f13a369849",
+        "platform_url": "https://app.localtest.me:3001/integration_plugins/candidate_assessments/redirect/c2db3246-fac3-4e77-852a-d1f13a369849",
+        "created_at": "2025-09-30 16:58:23 +0100",
+        "updated_at": "2025-09-30 16:58:23 +0100"
+    },
+    {
+        "id": "d88e2f03-6368-4217-8922-d56df6994ea2",
+        "name": "Dave Edwards",
+        "email": "dave@dwedigital.com",
+        "status": "pending",
+        "description": "Pandas: Not Just Cute Bears",
+        "webhook_url": "https://app.localtest.me:3001/integration_plugins/webhooks/events/e5daac6a-1b9e-460e-88ee-6b3e8cb53232",
+        "platform_url": null,
+        "created_at": "2025-10-03 16:14:35",
+        "updated_at": "2025-10-03 16:14:35"
+    },
+    {
+        "id": "4b1407f7-57b6-411b-8764-44acb3fb0c53",
+        "name": "Dave Edwards",
+        "email": "dave@dwedigital.com",
+        "status": "pending",
+        "description": "Pandas: Not Just Cute Bears",
+        "webhook_url": "https://app.localtest.me:3001/integration_plugins/webhooks/events/e5daac6a-1b9e-460e-88ee-6b3e8cb53232",
+        "platform_url": "https://app.localtest.me:3001/integration_plugins/candidate_assessments/redirect/4ce143e3-b789-4261-83ae-a8a92b388b39",
+        "created_at": "2025-10-03 16:16:01",
+        "updated_at": "2025-10-03 16:16:01"
+    },
+    {
+        "id": "af863ef2-4ec6-4e9e-b792-1244a8d38001",
+        "name": "Dave Edwards",
+        "email": "dave@dwedigital.com",
+        "status": "pending",
+        "description": "Pandas: Not Just Cute Bears",
+        "webhook_url": "https://app.localtest.me:3001/integration_plugins/webhooks/events/e5daac6a-1b9e-460e-88ee-6b3e8cb53232",
+        "platform_url": "https://app.localtest.me:3001/integration_plugins/candidate_assessments/redirect/a0606a61-9df1-4bd9-a1d9-b787c8db376c",
+        "created_at": "2025-10-03 16:21:37",
+        "updated_at": "2025-10-03 16:21:37"
+    },
+    {
+        "id": "82f52044-3491-4c9e-9042-7b43116cd5f2",
+        "name": "Dave Edwards",
+        "email": "dave@dwedigital.com",
+        "status": "pending",
+        "description": "Pandas: Not Just Cute Bears",
+        "webhook_url": "https://app.localtest.me:3001/integration_plugins/webhooks/events/e5daac6a-1b9e-460e-88ee-6b3e8cb53232",
+        "platform_url": "https://app.localtest.me:3001/integration_plugins/candidate_assessments/redirect/6850f3e3-a7cd-4c14-8e4d-15871a4ba944",
+        "created_at": "2025-10-03 16:22:40",
+        "updated_at": "2025-10-03 16:22:40"
+    },
+    {
+        "id": "5186f580-91c6-4a0e-8b8a-348ee5d92f66",
+        "name": "Dave Edwards",
+        "email": "dave@dwedigital.com",
+        "status": "pending",
+        "description": "Pandas: Not Just Cute Bears",
+        "webhook_url": "https://app.localtest.me:3001/integration_plugins/webhooks/events/e5daac6a-1b9e-460e-88ee-6b3e8cb53232",
+        "platform_url": "https://app.localtest.me:3001/integration_plugins/candidate_assessments/redirect/5a443918-bc2f-4cc2-8ead-439af005cd83",
+        "created_at": "2025-10-03 16:28:04",
+        "updated_at": "2025-10-03 16:28:04"
+    },
+    {
+        "id": "6c27b3a7-8153-4b08-a39c-d33f916bdc06",
+        "name": "Dave Edwards",
+        "email": "dave@dwedigital.com",
+        "status": "pending",
+        "description": "Pandas: Not Just Cute Bears",
+        "webhook_url": "https://app.localtest.me:3001/integration_plugins/webhooks/events/e5daac6a-1b9e-460e-88ee-6b3e8cb53232",
+        "platform_url": "https://app.localtest.me:3001/integration_plugins/candidate_assessments/redirect/16692250-f733-4e21-be16-828faa36b71c",
+        "created_at": "2025-10-03 16:28:29",
+        "updated_at": "2025-10-03 16:28:29"
+    },
+    {
+        "id": "9aca8028-2343-4771-88f2-650cbe9a4e8f",
+        "name": "Dave Edwards",
+        "email": "dave@dwedigital.com",
+        "status": "pending",
+        "description": "Pandas: Not Just Cute Bears",
+        "webhook_url": "https://app.localtest.me:3001/integration_plugins/webhooks/events/e5daac6a-1b9e-460e-88ee-6b3e8cb53232",
+        "platform_url": "https://app.localtest.me:3001/integration_plugins/candidate_assessments/redirect/22376869-cf34-4bce-94d2-a5a2802ab20d",
+        "created_at": "2025-10-03 16:29:36",
+        "updated_at": "2025-10-03 16:29:36"
+    }
 ]

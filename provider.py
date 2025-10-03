@@ -2,6 +2,7 @@ from fastapi import FastAPI, Header, Request
 from helpers import svg_file_to_base64, png_to_base64, get_field_value
 from typing import Annotated
 import requests as apiRequests
+import uuid
 
 app = FastAPI()
 
@@ -88,20 +89,24 @@ async def export(request: Request):
             ],
             "submitEndpoint": "/create_assessment",
         }
-    
+
     try:
-        packages = apiRequests.get("http://localhost:8001/packages", headers={"X_EXAMPLE_ASSESSMENTS_KEY": api_key})
+        packages = apiRequests.get(
+            "http://localhost:8001/packages",
+            headers={"X_EXAMPLE_ASSESSMENTS_KEY": api_key},
+        )
         if packages.status_code != 200:
-            raise Exception(f"Failed to fetch packages: {packages.status_code} {packages.text}")
+            raise Exception(
+                f"Failed to fetch packages: {packages.status_code} {packages.text}"
+            )
         else:
             packages = packages.json()
-            packages =  [{"label": package["name"], "value": str(package["id"])} for package in packages]
+            packages = [
+                {"label": name, "value": str(id)}
+                for id, name in packages.items()
+            ]
     except Exception as e:
         print(f"Error fetching packages: {str(e)}")
-
-
-
-
 
     # Extract candidate information
     # candidate_info = assessmentData.get("candidate", {})
@@ -152,17 +157,23 @@ async def export(request: Request):
 
 
 @app.post("/create_assessment")
-async def create_assessment(request):
-    
+async def create_assessment(request: Request):
+    print("Create Assessment Called")
+
     form_data = await request.json()
     print("Form Data Received: ", form_data)
+    id = uuid.uuid4()
+    api_base_url = request.headers.get("x_example_base_url")
 
     assessment_payload = {
-        "firstName": form_data.get("firstName"),
-        "lastName": form_data.get("lastName"),
-        "email": form_data.get("email"),
-        "packageId": form_data.get("selectedTest"),
+        "id": str(id),
+        "name": f"{get_field_value(form_data, 'firstName')} {get_field_value(form_data, 'lastName')}",
+        "email": get_field_value(form_data, "email"),
+        "packageId": get_field_value(form_data, "selectedTest"),
+        "webhookUrl": form_data.get("webhookUrl"),
+        "platformUrl": form_data.get("generatedUuidRedirectUrl"),
     }
+    print("Assessment Payload: ", assessment_payload)
 
     try:
         response = apiRequests.post(
@@ -170,17 +181,35 @@ async def create_assessment(request):
             json=assessment_payload,
             headers={"X_EXAMPLE_ASSESSMENTS_KEY": API_KEY},
         )
+        print("STATUS:", response.status_code)
         if response.status_code != 200:
-            raise Exception(f"Failed to create assessment: {response.status_code} {response.text}")
+            return {
+                "resultVersion": "1.0.0",
+                "key": "createAssessment",
+                "success": False,
+                "toast": {
+                    "error": "API Key was blank. Please check the configuration.",
+
+                },
+            }
         else:
             assessment = response.json()
             print("Assessment created successfully:", assessment)
             return {
-                "status": "success",
-                "message": "Assessment created successfully",
-                "assessmentId": assessment.get("id"),
-                "assessmentLink": f"http://localhost:8001/assessments/{assessment.get('id')}",
-            }
+          'resultVersion': '1.0.0',
+          'key': 'createAssessment',
+          'success': True,
+          'assessmentName': assessment['name'],
+          'message': "\n".join([
+            f"{get_field_value(form_data, 'firstName')} was successfully sent to the example assessment plugin.",
+            f"Last name was {get_field_value(form_data, 'lastName')}.",
+            f"The external ID was {str(assessment['id'])}."
+          ]),
+          'status': assessment['status'],
+          'externalIdentifier': str(assessment['id']),
+          'externalRecordUrl': f"{api_base_url}/api/{assessment['id']}",
+          'externalLinks': [],
+        }
     except Exception as e:
         print(f"Error creating assessment: {str(e)}")
         return {

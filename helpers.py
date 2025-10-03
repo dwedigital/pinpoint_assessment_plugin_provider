@@ -108,6 +108,12 @@ def get_field_value(data, field_key):
             return field["value"]
     return None
 
+def get_configuration_value(data, field_key):
+    for config in data.get("configurationValues", []):
+        if config["key"] == field_key:
+            return config["value"]
+    return None
+
 
 def get_assessment_database():
     import json
