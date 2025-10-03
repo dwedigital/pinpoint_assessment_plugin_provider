@@ -94,7 +94,7 @@ async def export(request: Request):
 
     try:
         packages = apiRequests.get(
-            "http://localhost:8001/packages",
+            "http://localhost:8001/api/packages",
             headers={"X_EXAMPLE_ASSESSMENTS_KEY": api_key},
         )
         if packages.status_code != 200:
@@ -178,7 +178,7 @@ async def create_assessment(request: Request):
 
     try:
         response = apiRequests.post(
-            "http://localhost:8001/assessments/",
+            "http://localhost:8001/api/assessments/",
             json=assessment_payload,
             headers={"X_EXAMPLE_ASSESSMENTS_KEY": API_KEY},
         )

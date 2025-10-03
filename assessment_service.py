@@ -55,17 +55,17 @@ async def read_assessments_list():
     return PACKAGES
 
 
-@protected_router.get("/assessments/{id}")
-async def read_assessment(id: str):
-    for assessment in assessments:
-        if assessment["id"] == id:
-            return HTMLResponse(
-                content=f"<h1>Assessment ID: {id}</h1><p>{assessment["name"]}</p>",
-                status_code=200,
-            )
-    return HTMLResponse(
-        content=f"<h1>Assessment ID: {id} not found</h1>", status_code=404
-    )
+# @protected_router.get("/assessments/{id}")
+# async def read_assessment(id: str):
+#     for assessment in assessments:
+#         if assessment["id"] == id:
+#             return HTMLResponse(
+#                 content=f"<h1>Assessment ID: {id}</h1><p>{assessment["name"]}</p>",
+#                 status_code=200,
+#             )
+#     return HTMLResponse(
+#         content=f"<h1>Assessment ID: {id} not found</h1>", status_code=404
+#     )
 
 
 @protected_router.post("/assessments/")
@@ -96,7 +96,7 @@ async def submit_assessment(assessment_details: dict):
 async def read_assessment(id: str):
     for assessment in assessments:
         if assessment["id"] == id:
-            return templates.TemplateResponse("assessment.html", {"request": {}, "assessment_id": id, "status": assessment.get("status")})
+            return templates.TemplateResponse("update_assessment.html", {"request": {}, "assessment_id": id, "status": assessment.get("status")})
 
     return HTMLResponse(
         content=f"<h1>Assessment ID: {id} not found</h1>", status_code=404
@@ -106,6 +106,7 @@ async def read_assessment(id: str):
 @app.post("/assessments/{id}/update")
 async def update_assessment(request: Request, id: str):
     form_data = await request.form()
+    print(id)
     status = form_data.get("status")
     for assessment in assessments:
         if assessment["id"] == id:
@@ -115,11 +116,12 @@ async def update_assessment(request: Request, id: str):
             write_assessments_database(assessments)
 
             payload = {
-                "id": form_data.get("id"),
+                "id": id,
                 "status": form_data.get("status"),
                 "score": form_data.get("score"),
                 "report_path": f"reports/{assessment['id']}"
             }
+            print(payload)
 
             requests.post(assessment["webhook_url"], json=payload, verify=False)
             return templates.TemplateResponse("update_assessment.html", {"request": {}, "assessment_id": id, "status": assessment.get("status")})
@@ -144,6 +146,8 @@ async def read_assessment_report(id: str):
         content=f"<h1>Assessment Report ID: {id} not found</h1>", status_code=404
     )
 
+
+app.include_router(protected_router)
 
 if __name__ == "__main__":
 
