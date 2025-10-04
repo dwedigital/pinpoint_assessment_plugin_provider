@@ -1,7 +1,12 @@
 from fastapi import FastAPI, Request
 from helpers import svg_file_to_base64, png_to_base64, get_field_value
-from pydantic import BaseModel
-from typing import Dict, Any
+from models import (
+    HelloResponse,
+    ConfigResponse,
+    ExportResponse,
+    CreateAssessmentSuccessResponse,
+    WebhookResponse,
+)
 import requests
 import uuid
 import json
@@ -27,7 +32,7 @@ API_KEY = "ABCDEFG123456789"
 ASSESSMENT_REPORT_PATH = "http://localhost:8001/assessments/"
 
 
-@app.get("/hello")
+@app.get("/hello", responses={200: {"model": HelloResponse}})
 async def index():
     """Health check endpoint.
 
@@ -37,7 +42,7 @@ async def index():
     return {"Message": "Hello, World!"}
 
 
-@app.post("/")
+@app.post("/", responses={200: {"model": ConfigResponse}})
 async def config():
     """Pinpoint plugin configuration endpoint.
 
@@ -103,7 +108,7 @@ async def config():
     }
 
 
-@app.post("/export")
+@app.post("/export", responses={200: {"model": ExportResponse}})
 async def export(request: Request):
     """Export metadata endpoint for the createAssessment action.
 
@@ -158,12 +163,6 @@ async def export(request: Request):
     except Exception as e:
         logger.error(f"Error fetching packages: {str(e)}")
 
-    # Extract candidate information
-    # candidate_info = assessmentData.get("candidate", {})
-    # first_name = candidate_info.get("firstName", "N/A")
-    # last_name = candidate_info.get("lastName", "N/A")
-    # email = candidate_info.get("email", "N/A")
-
     return {
         "actionVersion": "1.0.0",
         "key": "createAssessment",
@@ -206,27 +205,10 @@ async def export(request: Request):
     }
 
 
-@app.post("/create_assessment")
-async def create_assessment(data: Dict[str, Any], request: Request):
-    """Create a new assessment in the assessment service.
-
-    Processes the form submission from Pinpoint, creates an assessment payload,
-    and sends it to the assessment service. Returns success or failure status
-    with appropriate messaging for display in Pinpoint.
-
-    Args:
-        data (Dict[str, Any]): Form data containing candidate information and selected test.
-        request (Request): The incoming request object containing headers.
-
-    Returns:
-        dict: Result object containing:
-            - success: Whether the assessment was created successfully
-            - assessmentName: Name of the created assessment
-            - message: User-friendly message about the operation
-            - status: Current status of the assessment
-            - externalIdentifier: ID of the assessment in the external system
-            - externalRecordUrl: URL to the assessment record
-    """
+@app.post(
+    "/create_assessment", responses={200: {"model": CreateAssessmentSuccessResponse}}
+)
+async def create_assessment(request: Request):
     logger.info("Create Assessment Called")
 
     logger.info(f"Form Data Received: {data}")
@@ -287,23 +269,9 @@ async def create_assessment(data: Dict[str, Any], request: Request):
         }
 
 
-@app.post("/webhook")
-async def process_webhook(webhook_data: WebhookRequest):
-    """Process incoming webhooks from the assessment service.
+@app.post("/webhook", responses={200: {"model": WebhookResponse}})
+async def process_webhook(request: Request):
 
-    Receives webhook notifications from the assessment service about status
-    updates, score changes, and other assessment events. Processes the webhook
-    data and returns instructions to Pinpoint for updating the assessment.
-
-    Args:
-        webhook_data (WebhookRequest): Webhook payload containing the body string.
-
-    Returns:
-        dict: Result object containing:
-            - success: Whether the webhook was processed successfully
-            - updateAssessments: List of assessments to update with new status,
-              scores, and external links
-    """
     logger.info("Webhook Process Called")
     body = json.loads(webhook_data.body)
 
