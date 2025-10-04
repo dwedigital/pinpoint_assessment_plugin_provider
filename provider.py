@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 from helpers import svg_file_to_base64, png_to_base64, get_field_value
-import requests as apiRequests
+import requests
 import uuid
 import json
 
@@ -93,7 +93,7 @@ async def export(request: Request):
         }
 
     try:
-        packages = apiRequests.get(
+        packages = requests.get(
             "http://localhost:8001/api/packages",
             headers={"X_EXAMPLE_ASSESSMENTS_KEY": api_key},
         )
@@ -177,7 +177,7 @@ async def create_assessment(request: Request):
     print("Assessment Payload: ", assessment_payload)
 
     try:
-        response = apiRequests.post(
+        response = requests.post(
             "http://localhost:8001/api/assessments/",
             json=assessment_payload,
             headers={"X_EXAMPLE_ASSESSMENTS_KEY": API_KEY},
