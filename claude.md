@@ -1,0 +1,4 @@
+This project houses 2 FastAPI applications:
+
+1. `provider.py` is used to interact with Pinpoint's (an applicant tracking system) plugin framework which makes various requests to understand what it should render within its application and also passes payloads back to provider to then process and response with success or failure messages for in-app UI
+2. `assessment_service.py` acts as a mocked assessment provider that `provider.py` uses as if it were a 3rd party assessment platform to send assessment requests and it updates statuses and scores of assessments via the webhook URL Pinpoint provides which the `provider.py` passes within the assessment create payload
