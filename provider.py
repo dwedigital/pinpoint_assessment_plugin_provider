@@ -1,6 +1,5 @@
-from fastapi import FastAPI, Header, Request
+from fastapi import FastAPI, Request
 from helpers import svg_file_to_base64, png_to_base64, get_field_value
-from typing import Annotated
 import requests as apiRequests
 import uuid
 import json
