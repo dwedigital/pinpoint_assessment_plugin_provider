@@ -8,7 +8,7 @@ import json
 app = FastAPI()
 
 API_KEY = "ABCDEFG123456789"
-ASSESSMENT_REPORT_PATH  = "http://localhost:8001/assessments/"
+ASSESSMENT_REPORT_PATH = "http://localhost:8001/assessments/"
 
 
 @app.get("/hello")
@@ -242,7 +242,11 @@ async def process_webhook(request: Request):
                 "score": int(body.get("score")),
                 "shouldNotify": True,
                 "externalLinks": [
-                    {"key": "report", "label": "Report", "url": f"{ASSESSMENT_REPORT_PATH}{body.get("report_path")}"}
+                    {
+                        "key": "report",
+                        "label": "Report",
+                        "url": f"{ASSESSMENT_REPORT_PATH}{body.get("report_path")}",
+                    }
                 ],
             }
         ],

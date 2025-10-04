@@ -23,10 +23,7 @@ async def get_api_key(api_key: str = Security(api_key_header)):
 
 app = FastAPI()
 
-protected_router = APIRouter(
-    prefix="/api",
-    dependencies=[Security(get_api_key)]
-)
+protected_router = APIRouter(prefix="/api", dependencies=[Security(get_api_key)])
 
 
 assessments = get_assessment_database()
@@ -72,36 +69,43 @@ async def read_assessments_list():
 async def submit_assessment(assessment_details: dict):
 
     id = uuid.uuid4()
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S %z').strip()
-
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S %z").strip()
 
     assessment = {
-        'id': assessment_details['id'],
-        'name': assessment_details['name'],
-        'email': assessment_details['email'],
-        'status': 'pending',
+        "id": assessment_details["id"],
+        "name": assessment_details["name"],
+        "email": assessment_details["email"],
+        "status": "pending",
         # find the package with the id
-        'description': PACKAGES[int(assessment_details['packageId'])],
-        'webhook_url': assessment_details['webhookUrl'],
-        'platform_url': assessment_details['platformUrl'],
-        'created_at': timestamp,
-        'updated_at': timestamp,
-        }
+        "description": PACKAGES[int(assessment_details["packageId"])],
+        "webhook_url": assessment_details["webhookUrl"],
+        "platform_url": assessment_details["platformUrl"],
+        "created_at": timestamp,
+        "updated_at": timestamp,
+    }
 
     assessments.append(assessment)
     write_assessments_database(assessments)
     return assessment
 
+
 @app.get("/assessments/{id}")
 async def read_assessment(id: str):
     for assessment in assessments:
         if assessment["id"] == id:
-            return templates.TemplateResponse("update_assessment.html", {"request": {}, "assessment_id": id, "status": assessment.get("status")})
+            return templates.TemplateResponse(
+                "update_assessment.html",
+                {
+                    "request": {},
+                    "assessment_id": id,
+                    "status": assessment.get("status"),
+                },
+            )
 
     return HTMLResponse(
         content=f"<h1>Assessment ID: {id} not found</h1>", status_code=404
-
     )
+
 
 @app.post("/assessments/{id}/update")
 async def update_assessment(request: Request, id: str):
@@ -112,36 +116,50 @@ async def update_assessment(request: Request, id: str):
         if assessment["id"] == id:
             assessment["status"] = status
             assessment["score"] = form_data.get("score")
-            assessment["updated_at"] = datetime.now().strftime('%Y-%m-%d %H:%M:%S %z').strip()
+            assessment["updated_at"] = (
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S %z").strip()
+            )
             write_assessments_database(assessments)
 
             payload = {
                 "id": id,
                 "status": form_data.get("status"),
                 "score": form_data.get("score"),
-                "report_path": f"reports/{assessment['id']}"
+                "report_path": f"reports/{assessment['id']}",
             }
             print(payload)
 
             requests.post(assessment["webhook_url"], json=payload, verify=False)
-            return templates.TemplateResponse("update_assessment.html", {"request": {}, "assessment_id": id, "status": assessment.get("status")})
-    
-    
+            return templates.TemplateResponse(
+                "update_assessment.html",
+                {
+                    "request": {},
+                    "assessment_id": id,
+                    "status": assessment.get("status"),
+                },
+            )
+
     return HTMLResponse(
         content=f"<h1>Assessment ID: {id} not found</h1>", status_code=404
     )
+
 
 @app.get("/assessments/reports/{id}")
 async def read_assessment_report(id: str):
     for assessment in assessments:
         if assessment["id"] == id:
-            return templates.TemplateResponse("report.html", {"request": {}, "assessment_id": id, 
-                                                              "status": assessment.get("status"), "score": assessment.get("score"),
-                                                              "candidate_name": assessment.get("name"),
-                                                              "description": assessment.get("description"),
-                                                              "assessment_date": assessment.get("created_at")
-
-                                                              })
+            return templates.TemplateResponse(
+                "report.html",
+                {
+                    "request": {},
+                    "assessment_id": id,
+                    "status": assessment.get("status"),
+                    "score": assessment.get("score"),
+                    "candidate_name": assessment.get("name"),
+                    "description": assessment.get("description"),
+                    "assessment_date": assessment.get("created_at"),
+                },
+            )
     return HTMLResponse(
         content=f"<h1>Assessment Report ID: {id} not found</h1>", status_code=404
     )

@@ -108,6 +108,7 @@ def get_field_value(data, field_key):
             return field["value"]
     return None
 
+
 def get_configuration_value(data, field_key):
     for config in data.get("configurationValues", []):
         if config["key"] == field_key:
@@ -128,7 +129,8 @@ def get_assessment_database():
     except Exception as e:
         print(f"Error reading assessments database: {str(e)}")
         return []
-    
+
+
 def write_assessments_database(assessments):
     import json
 
