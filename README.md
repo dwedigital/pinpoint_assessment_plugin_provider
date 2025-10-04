@@ -122,7 +122,7 @@ The assessment service manages assessment packages, candidate assessments, and p
 2. **Form Generation**: Provider's `/export` endpoint fetches available packages from assessment service
 3. **Assessment Creation**: User submits form → Provider creates assessment → Assessment service stores it
 4. **Assessment Update**: User accesses `/assessments/{id}` → Updates status/score → Triggers webhook
-5. **Webhook Processing**: Assessment service sends update to provider's `/webhook` endpoint
+5. **Webhook Processing**: Assessment service sends update to provided callback URL (Pinpoint) and Pinpoint passes the recieved payload to `provider.py`'s `/webhook` endpoint
 6. **Report Viewing**: Assessment reports available at `/assessments/reports/{id}`
 
 ## Authentication
@@ -137,6 +137,7 @@ The provider service expects this in configuration and passes it as `X_EXAMPLE_A
 - Templates are stored in the `templates/` directory
 - Logo assets are referenced in the provider service (`logo.png`, `action-logo.svg`)
 - Hot reload is enabled when using the `--reload` flag with uvicorn
+- `assessment_database.json` is just a mocked database to hold assessments
 
 ## Deactivating Virtual Environment
 
