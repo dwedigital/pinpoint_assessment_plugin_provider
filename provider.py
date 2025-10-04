@@ -1,5 +1,12 @@
 from fastapi import FastAPI, Request
 from helpers import svg_file_to_base64, png_to_base64, get_field_value
+from models import (
+    HelloResponse,
+    ConfigResponse,
+    ExportResponse,
+    CreateAssessmentSuccessResponse,
+    WebhookResponse,
+)
 import requests
 import uuid
 import json
@@ -19,13 +26,13 @@ API_KEY = "ABCDEFG123456789"
 ASSESSMENT_REPORT_PATH = "http://localhost:8001/assessments/"
 
 
-@app.get("/hello")
+@app.get("/hello", responses={200: {"model": HelloResponse}})
 async def index():
 
     return {"Message": "Hello, World!"}
 
 
-@app.post("/")
+@app.post("/", responses={200: {"model": ConfigResponse}})
 async def config():
     return {
         "version": "1.0.0",
@@ -75,7 +82,7 @@ async def config():
     }
 
 
-@app.post("/export")
+@app.post("/export", responses={200: {"model": ExportResponse}})
 async def export(request: Request):
     headers = dict(request.headers)
     api_key = headers.get("x_example_assessments_key")
@@ -166,7 +173,7 @@ async def export(request: Request):
     }
 
 
-@app.post("/create_assessment")
+@app.post("/create_assessment", responses={200: {"model": CreateAssessmentSuccessResponse}})
 async def create_assessment(request: Request):
     logger.info("Create Assessment Called")
 
@@ -229,7 +236,7 @@ async def create_assessment(request: Request):
         }
 
 
-@app.post("/webhook")
+@app.post("/webhook", responses={200: {"model": WebhookResponse}})
 async def process_webhook(request: Request):
 
     logger.info("Webhook Process Called")
