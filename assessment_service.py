@@ -23,9 +23,18 @@ async def get_api_key(api_key: str = Security(api_key_header)):
 
 app = FastAPI()
 
+# Create a router for protected routes and prefix them with /api
 protected_router = APIRouter(prefix="/api", dependencies=[Security(get_api_key)])
 
-
+allowed_statuses = [
+    "pending",
+    "completed",
+    "abandoned",
+    "failed",
+    "cancelled",
+    "archived",
+    "not_started",
+]
 assessments = get_assessment_database()
 
 PACKAGES = {
@@ -52,21 +61,12 @@ async def read_assessments_list():
     return PACKAGES
 
 
-# @protected_router.get("/assessments/{id}")
-# async def read_assessment(id: str):
-#     for assessment in assessments:
-#         if assessment["id"] == id:
-#             return HTMLResponse(
-#                 content=f"<h1>Assessment ID: {id}</h1><p>{assessment["name"]}</p>",
-#                 status_code=200,
-#             )
-#     return HTMLResponse(
-#         content=f"<h1>Assessment ID: {id} not found</h1>", status_code=404
-#     )
-
-
 @protected_router.post("/assessments/")
 async def submit_assessment(assessment_details: dict):
+    """Submit a new assessment.
+    Args:
+        assessment_details (dict): The details of the assessment to submit.
+    """
 
     id = uuid.uuid4()
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S %z").strip()
@@ -91,6 +91,9 @@ async def submit_assessment(assessment_details: dict):
 
 @app.get("/assessments/{id}")
 async def read_assessment(id: str):
+    """Render the assessment update page.
+    Args:
+        id (str): The ID of the assessment to render."""
     for assessment in assessments:
         if assessment["id"] == id:
             return templates.TemplateResponse(
@@ -109,6 +112,10 @@ async def read_assessment(id: str):
 
 @app.post("/assessments/{id}/update")
 async def update_assessment(request: Request, id: str):
+    """Process the assessment update form submission.
+    Args:
+        request (Request): The incoming request object.
+        id (str): The ID of the assessment to update."""
     form_data = await request.form()
     print(id)
     status = form_data.get("status")
@@ -146,6 +153,10 @@ async def update_assessment(request: Request, id: str):
 
 @app.get("/assessments/reports/{id}")
 async def read_assessment_report(id: str):
+    """Render the assessment report page.
+    Args:
+        id (str): The ID of the assessment to render.
+    """
     for assessment in assessments:
         if assessment["id"] == id:
             return templates.TemplateResponse(
@@ -164,7 +175,7 @@ async def read_assessment_report(id: str):
         content=f"<h1>Assessment Report ID: {id} not found</h1>", status_code=404
     )
 
-
+# Include the protected router routes
 app.include_router(protected_router)
 
 if __name__ == "__main__":

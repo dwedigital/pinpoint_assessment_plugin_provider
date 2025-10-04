@@ -105,12 +105,12 @@
         "id": "06cc70e8-28d5-4165-90c0-0cc1a4ba63a3",
         "name": "Dave Edwards",
         "email": "bob@gmail.com",
-        "status": "completed",
+        "status": "in_progress",
         "description": "Django Unchained (From PHP)",
         "webhook_url": "https://app.localtest.me:3001/integration_plugins/webhooks/events/e5daac6a-1b9e-460e-88ee-6b3e8cb53232",
         "platform_url": "https://app.localtest.me:3001/integration_plugins/candidate_assessments/redirect/0b6398d4-6a9e-447c-ac99-05e2cd6c0d6d",
         "created_at": "2025-10-03 18:16:02",
-        "updated_at": "2025-10-03 18:16:32",
-        "score": "77"
+        "updated_at": "2025-10-04 11:32:05",
+        "score": "22"
     }
 ]
