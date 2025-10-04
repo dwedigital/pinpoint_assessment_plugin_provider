@@ -1,11 +1,20 @@
 from fastapi import FastAPI, HTTPException, Security, APIRouter, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from helpers import get_assessment_database, write_assessments_database
 from fastapi.security import APIKeyHeader
 from datetime import datetime
 import uuid
 from fastapi.templating import Jinja2Templates
 import requests
+import logging
+
+# Configure logging with timestamps
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+logger = logging.getLogger(__name__)
 
 templates = Jinja2Templates(directory="templates")
 
@@ -102,6 +111,9 @@ async def read_assessment(id: str):
                     "request": {},
                     "assessment_id": id,
                     "status": assessment.get("status"),
+                    "current_score": (
+                        assessment.get("score") if assessment.get("score") else ""
+                    ),
                 },
             )
 
@@ -117,8 +129,13 @@ async def update_assessment(request: Request, id: str):
         request (Request): The incoming request object.
         id (str): The ID of the assessment to update."""
     form_data = await request.form()
-    print(id)
+    logger.info(f"Assessment ID: {id}")
     status = form_data.get("status")
+    if status not in allowed_statuses:
+        return HTMLResponse(
+            content=f"<h1>Status: {status} is not allowed. Allowed statuses are: {', '.join(allowed_statuses)}</h1>",
+            status_code=400,
+        )
     for assessment in assessments:
         if assessment["id"] == id:
             assessment["status"] = status
@@ -134,17 +151,10 @@ async def update_assessment(request: Request, id: str):
                 "score": form_data.get("score"),
                 "report_path": f"reports/{assessment['id']}",
             }
-            print(payload)
+            logger.info(f"Payload: {payload}")
 
             requests.post(assessment["webhook_url"], json=payload, verify=False)
-            return templates.TemplateResponse(
-                "update_assessment.html",
-                {
-                    "request": {},
-                    "assessment_id": id,
-                    "status": assessment.get("status"),
-                },
-            )
+            return RedirectResponse(url=f"/assessments/{id}", status_code=303)
 
     return HTMLResponse(
         content=f"<h1>Assessment ID: {id} not found</h1>", status_code=404
@@ -174,6 +184,7 @@ async def read_assessment_report(id: str):
     return HTMLResponse(
         content=f"<h1>Assessment Report ID: {id} not found</h1>", status_code=404
     )
+
 
 # Include the protected router routes
 app.include_router(protected_router)

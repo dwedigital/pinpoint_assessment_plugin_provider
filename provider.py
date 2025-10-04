@@ -3,6 +3,15 @@ from helpers import svg_file_to_base64, png_to_base64, get_field_value
 import requests
 import uuid
 import json
+import logging
+
+# Configure logging with timestamps
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -70,8 +79,8 @@ async def config():
 async def export(request: Request):
     headers = dict(request.headers)
     api_key = headers.get("x_example_assessments_key")
-    print(headers)
-    print("API Key: ", headers.get("x_example_assessments_key"))
+    logger.info(headers)
+    logger.info(f"API Key: {headers.get('x_example_assessments_key')}")
     # Extract configuration values
 
     if api_key != API_KEY or not api_key:
@@ -107,7 +116,7 @@ async def export(request: Request):
                 {"label": name, "value": str(id)} for id, name in packages.items()
             ]
     except Exception as e:
-        print(f"Error fetching packages: {str(e)}")
+        logger.error(f"Error fetching packages: {str(e)}")
 
     # Extract candidate information
     # candidate_info = assessmentData.get("candidate", {})
@@ -159,10 +168,10 @@ async def export(request: Request):
 
 @app.post("/create_assessment")
 async def create_assessment(request: Request):
-    print("Create Assessment Called")
+    logger.info("Create Assessment Called")
 
     form_data = await request.json()
-    print("Form Data Received: ", form_data)
+    logger.info(f"Form Data Received: {form_data}")
     id = uuid.uuid4()
     api_base_url = request.headers.get("x_example_base_url")
 
@@ -174,7 +183,7 @@ async def create_assessment(request: Request):
         "webhookUrl": form_data.get("webhookUrl"),
         "platformUrl": form_data.get("generatedUuidRedirectUrl"),
     }
-    print("Assessment Payload: ", assessment_payload)
+    logger.info(f"Assessment Payload: {assessment_payload}")
 
     try:
         response = requests.post(
@@ -182,7 +191,7 @@ async def create_assessment(request: Request):
             json=assessment_payload,
             headers={"X_EXAMPLE_ASSESSMENTS_KEY": API_KEY},
         )
-        print("STATUS:", response.status_code)
+        logger.info(f"STATUS: {response.status_code}")
         if response.status_code != 200:
             return {
                 "resultVersion": "1.0.0",
@@ -194,7 +203,7 @@ async def create_assessment(request: Request):
             }
         else:
             assessment = response.json()
-            print("Assessment created successfully:", assessment)
+            logger.info(f"Assessment created successfully: {assessment}")
             return {
                 "resultVersion": "1.0.0",
                 "key": "createAssessment",
@@ -213,7 +222,7 @@ async def create_assessment(request: Request):
                 "externalLinks": [],
             }
     except Exception as e:
-        print(f"Error creating assessment: {str(e)}")
+        logger.error(f"Error creating assessment: {str(e)}")
         return {
             "status": "error",
             "message": f"Error creating assessment: {str(e)}",
@@ -223,11 +232,11 @@ async def create_assessment(request: Request):
 @app.post("/webhook")
 async def process_webhook(request: Request):
 
-    print("Webhook Process Called")
+    logger.info("Webhook Process Called")
     request = await request.json()
     body = json.loads(request["body"])
 
-    print("Webhook Data Received: ", body)
+    logger.info(f"Webhook Data Received: {body}")
 
     # Process the webhook data as needed
     # For example, you might want to update the assessment status based on the webhook event
