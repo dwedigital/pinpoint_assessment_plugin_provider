@@ -125,12 +125,6 @@ async def export(request: Request):
     except Exception as e:
         logger.error(f"Error fetching packages: {str(e)}")
 
-    # Extract candidate information
-    # candidate_info = assessmentData.get("candidate", {})
-    # first_name = candidate_info.get("firstName", "N/A")
-    # last_name = candidate_info.get("lastName", "N/A")
-    # email = candidate_info.get("email", "N/A")
-
     return {
         "actionVersion": "1.0.0",
         "key": "createAssessment",
@@ -173,7 +167,9 @@ async def export(request: Request):
     }
 
 
-@app.post("/create_assessment", responses={200: {"model": CreateAssessmentSuccessResponse}})
+@app.post(
+    "/create_assessment", responses={200: {"model": CreateAssessmentSuccessResponse}}
+)
 async def create_assessment(request: Request):
     logger.info("Create Assessment Called")
 

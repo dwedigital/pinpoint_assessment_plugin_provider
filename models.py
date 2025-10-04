@@ -64,14 +64,14 @@ class FormField(BaseModel):
     key: str
     label: str
     type: str
-    required: Optional[bool] 
-    readonly: Optional[bool] 
-    includeValueInRefetch: Optional[bool] 
-    placeholder: Optional[str] 
-    value: Optional[str] 
-    singleSelectOptions: Optional[List[SelectOption]] 
-    intent: Optional[str] 
-    description: Optional[str] 
+    required: Optional[bool]
+    readonly: Optional[bool]
+    includeValueInRefetch: Optional[bool]
+    placeholder: Optional[str]
+    value: Optional[str]
+    singleSelectOptions: Optional[List[SelectOption]]
+    intent: Optional[str]
+    description: Optional[str]
 
 
 class ExportResponse(BaseModel):
