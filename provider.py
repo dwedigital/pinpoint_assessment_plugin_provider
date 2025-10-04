@@ -12,6 +12,7 @@ ASSESSMENT_REPORT_PATH = "http://localhost:8001/assessments/"
 
 @app.get("/hello")
 async def index():
+
     return {"Message": "Hello, World!"}
 
 

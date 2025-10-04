@@ -140,4 +140,5 @@ def write_assessments_database(assessments):
             return True
     except Exception as e:
         print(f"Error writing assessments database: {str(e)}")
+
         return False
